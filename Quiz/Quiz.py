@@ -4,6 +4,7 @@ import time
 import tkinter.messagebox
 from PIL import Image, ImageTk
 import os
+import pygame
 
 class MathQuiz(tk.Tk):
     def get_time_limit(self):
@@ -90,6 +91,12 @@ class MathQuiz(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Arithmetic Quiz")
+        
+        # Initialize pygame mixer
+        pygame.mixer.init()
+        
+        # Load the sound file
+        self.bayle_sound = pygame.mixer.Sound(os.path.join("Silly_Folder", "Bayle.mp3"))
 
         self.attributes('-fullscreen', True)
         self.bind("<Escape>", lambda e: self.attributes("-fullscreen", False))
@@ -251,7 +258,9 @@ class MathQuiz(tk.Tk):
         summary = f"Score: {self.correct_answers}"
         self.question_label.config(text=summary)
 
-        if self.correct_answers >= 100 and self.time_limit == 120:
+        if self.correct_answers == 99 and self.time_limit == 120:
+            self.bayle_sound.play()
+        elif self.correct_answers >= 100 and self.time_limit == 120:
             self.play_celebration_gif()
 
         self.try_again_button = tk.Button(
@@ -296,6 +305,7 @@ class MathQuiz(tk.Tk):
         self.update_start_countdown()
 
     def quit_application(self):
+        pygame.mixer.quit()  
         self.destroy()
 
 if __name__ == "__main__":
