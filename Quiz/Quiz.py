@@ -91,17 +91,14 @@ class MathQuiz(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Arithmetic Quiz")
-        
-        # Initialize pygame mixer
+    
         pygame.mixer.init()
         
-        # Load the sound file
         self.bayle_sound = pygame.mixer.Sound(os.path.join("Silly_Folder", "Bayle.mp3"))
 
         self.attributes('-fullscreen', True)
         self.bind("<Escape>", lambda e: self.attributes("-fullscreen", False))
         
-        # Add Ctrl+R shortcut binding
         self.bind("<Control-r>", lambda e: self.reset_quiz())
 
         self.num_questions = 200   
@@ -115,7 +112,6 @@ class MathQuiz(tk.Tk):
         self.timer_label = tk.Label(self, font=("Arial", 24), fg="black")
         self.timer_label.place(x=10, y=10)
 
-        # Add score tracker in upper right
         self.score_label = tk.Label(
             self,
             text="Score: 0",
@@ -124,7 +120,6 @@ class MathQuiz(tk.Tk):
         )
         self.score_label.place(relx=0.98, y=10, anchor="ne")
 
-        # Add reset button in bottom left
         self.reset_button = tk.Button(
             self,
             text="Reset Quiz (Ctrl+R)",
