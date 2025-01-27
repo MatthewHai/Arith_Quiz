@@ -108,10 +108,19 @@ class MathQuiz(tk.Tk):
         self.timer_label = tk.Label(self, font=("Arial", 24), fg="black")
         self.timer_label.place(x=10, y=10)
 
+        # Add score tracker in upper right
+        self.score_label = tk.Label(
+            self,
+            text="Score: 0",
+            font=("Arial", 24),
+            fg="black"
+        )
+        self.score_label.place(relx=0.98, y=10, anchor="ne")
+
         # Add reset button in bottom left
         self.reset_button = tk.Button(
             self,
-            text="Reset Quiz",
+            text="Reset Quiz (Ctrl+R)",
             font=("Arial", 14),
             command=self.reset_quiz
         )
@@ -205,6 +214,7 @@ class MathQuiz(tk.Tk):
         self.answer_var.set("")
 
         self.current_question += 1
+        self.score_label.config(text=f"Score: {self.correct_answers}")
 
     def on_text_change(self, *args):
         if self.quiz_ended:
@@ -226,6 +236,7 @@ class MathQuiz(tk.Tk):
 
         if user_number == self.expected:
             self.correct_answers += 1
+            self.score_label.config(text=f"Score: {self.correct_answers}")
             self.next_question()
 
     def end_quiz(self):
@@ -276,6 +287,7 @@ class MathQuiz(tk.Tk):
         self.answer_var.set("")
 
         self.timer_label.config(text=f"Time left: {self.time_limit}s")
+        self.score_label.config(text="Score: 0")
 
         self.countdown_label.config(text="")
         self.countdown_label.pack(pady=20)      
