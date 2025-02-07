@@ -53,30 +53,69 @@ class MathQuiz(tk.Tk):
         return self.time_input or 120 
 
     def play_celebration_gif(self):
+        """
+        Plays the 'oia-uia.gif' on the right side for big celebrations (e.g. 100 correct).
+        """
         self.gif_label = tk.Label(self)
+        # Place on the right side
         self.gif_label.place(relx=0.8, rely=0.5, anchor="center")
     
-        gif_path = os.path.join("Silly_Folder", "oia-uia.gif")
-        gif = Image.open(gif_path)
+        gif_path1 = os.path.join("Silly_Folder", "oia-uia.gif")
+        gif1 = Image.open(gif_path1)
         
-        self.gif_frames = []
-        self.current_frame = 0
+        self.gif1_frames = []
+        self.current_frame1 = 0
         
         try:
             while True:
-                self.gif_frames.append(ImageTk.PhotoImage(gif.copy()))
-                gif.seek(len(self.gif_frames))
+                self.gif1_frames.append(ImageTk.PhotoImage(gif1.copy()))
+                gif1.seek(len(self.gif1_frames))
         except EOFError:
             pass
         
         def update_frame():
             if hasattr(self, 'gif_label'):
-                frame = self.gif_frames[self.current_frame]
+                frame = self.gif1_frames[self.current_frame1]
                 self.gif_label.configure(image=frame)
-                self.current_frame = (self.current_frame + 1) % len(self.gif_frames)
+                self.current_frame1 = (self.current_frame1 + 1) % len(self.gif1_frames)
                 self.after(50, update_frame)
         
         update_frame()
+
+    def play_left_gif2(self):
+        """
+        Plays the 'fish-spinning.gif' on the left side when user reaches 25 correct answers.
+        Remains until reset_quiz() is called.
+        """
+        # If it's already playing, do nothing
+        if hasattr(self, 'gif2_label'):
+            return
+        
+        self.gif2_label = tk.Label(self)
+        # Place on the left side
+        self.gif2_label.place(relx=0.1, rely=0.5, anchor="center")
+
+        gif_path2 = os.path.join("Silly_Folder", "fish-spinning.gif")
+        gif2 = Image.open(gif_path2)
+
+        self.gif2_frames = []
+        self.current_frame2 = 0
+        
+        try:
+            while True:
+                self.gif2_frames.append(ImageTk.PhotoImage(gif2.copy()))
+                gif2.seek(len(self.gif2_frames))
+        except EOFError:
+            pass
+
+        def update_frame2():
+            if hasattr(self, 'gif2_label'):
+                frame = self.gif2_frames[self.current_frame2]
+                self.gif2_label.configure(image=frame)
+                self.current_frame2 = (self.current_frame2 + 1) % len(self.gif2_frames)
+                self.after(50, update_frame2)
+
+        update_frame2()
 
     def __init__(self):
         super().__init__()
@@ -190,7 +229,11 @@ class MathQuiz(tk.Tk):
             self.correct_answers += 1
             self.score_label.config(text=f"Score: {self.correct_answers}")
 
-            # If user hits multiple of 5 => do random location/time
+            # Check if we've just hit 25 correct answers -> play gif2 on left
+            if self.correct_answers == 25:
+                self.play_left_gif2()
+
+            # If user hits multiple of 5 => do random location/time for video
             if self.direct_stream_url and self.correct_answers % 5 == 0:
                 self.randomize_location_and_seek()
 
@@ -241,7 +284,6 @@ class MathQuiz(tk.Tk):
         self.vlc_player.play()
 
         # Step 2: after minimal delay, pause & seek
-        # Then show the frame & unpause
         self.after(100, lambda: self._pause_seek_show(rand_x, rand_y))
 
     def _pause_seek_show(self, rand_x, rand_y):
@@ -336,6 +378,7 @@ class MathQuiz(tk.Tk):
         summary = f"Score: {self.correct_answers}"
         self.question_label.config(text=summary)
 
+        # Existing special cases
         if self.correct_answers == 99 and self.time_limit == 120:
             self.bayle_sound.play()
         elif self.correct_answers >= 100 and self.time_limit == 120:
@@ -352,6 +395,12 @@ class MathQuiz(tk.Tk):
         self.end_button.pack(pady=10)
 
     def reset_quiz(self):
+        # If the left-side gif2 is playing, remove it
+        if hasattr(self, 'gif2_label'):
+            self.gif2_label.destroy()
+            delattr(self, 'gif2_label')
+
+        # If the right-side celebration gif is playing, remove it
         if hasattr(self, 'gif_label'):
             self.gif_label.destroy()
             delattr(self, 'gif_label')
